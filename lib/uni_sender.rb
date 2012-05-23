@@ -34,6 +34,12 @@ module UniSender
           when Hash
             couple.last.each do |key, value|
               iparams["#{couple.first}[#{key}]"] = URI.encode(value.to_s)
+              if value.is_a?(Hash)
+                iparams.delete("#{couple.first}[#{key}]")
+                value.each do |k,v|
+                  iparams["#{couple.first}[#{key}][#{k}]"] = URI.encode(v.to_s)
+                end
+              end
             end
             nil
           else
