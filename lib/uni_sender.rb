@@ -51,7 +51,17 @@ module UniSender
 
       def method_missing(undefined_action, *args, &block)
         params = (args.first.is_a?(Hash) ? args.first : {} )
-        default_request(undefined_action.to_s.camelize(false), params)
+        if undefined_action == "importContacts"
+          import_contacts(params)
+        else
+          default_request(undefined_action.to_s.camelize(false), params)
+        end
+      end
+
+      def import_contacts(params)
+        params = translate_params(params) if defined?('translate_params')
+        params.merge!({'api_key'=>api_key, 'format'=>'json'})
+        JSON.parse(Net::HTTP.post_form(URI.parse('http://api.unisender.com/ru/api/importContacts?format=json'),params).body)
       end
 
       def default_request(action, params={})
